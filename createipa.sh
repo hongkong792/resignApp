@@ -8,7 +8,7 @@ ipaPath="/Users/vincent/Documents/auto_path/ipa"
 
 # Provisioning Profile 需修改 查看本地配置文件
 PROVISIONING_PROFILE=`/Users/vincent/Documents/自动批量打包/realm三部曲/parseProvision.sh`
-
+#PROVISIONING_PROFILE="/Users/vincent/Documents/auto_path/mobileprovision/Architect.mobileprovision"
 # Project Name
 projectName="tiku"
 
@@ -48,6 +48,24 @@ echo "${PROVISIONING_PROFILE}\n"
 echo "$CODE_SIGN_IDENTITY"
 echo "$PROVISIONING_PROFILE"
 
+
+###检查cocoapods
+PODS_ROOT="$projectDir/Pods"
+echo $PODS_ROOT
+diff "${PODS_ROOT}/../Podfile.lock" "${PODS_ROOT}/Manifest.lock" > /dev/null
+if [[ $? != 0 ]] ; then
+#cat << EOM
+#error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
+#EOM
+#exit 1
+cd ${projectDir}
+pod install --verbose
+#echo "they are not common"
+fi
+
+
+
+
 #xcodebuild -workspace ${projectDir}/${projectName}.xcworkspace \
 #-scheme ${schemeName} \
 #-sdk iphoneos \
@@ -55,6 +73,8 @@ echo "$PROVISIONING_PROFILE"
 #PROVISIONING_PROFILE="${PROVISIONING_PROFILE}" \
 #-configuration Release \
 #-derivedDataPath ${projectDir}/build
+
+
 
 
 xcodebuild  \

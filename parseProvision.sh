@@ -10,7 +10,11 @@
 function findMobileProvision()
 {
 
-    rootpath="/Users/vincent/Library/MobileDevice/Provisioning Profiles/"
+    flag=0
+#    rootpath="/Users/vincent/Library/MobileDevice/Provisioning Profiles/"
+    rootpath=$1
+#    echo "路径：："$rootpath
+
     cd "$rootpath"
     output_plist_file="/Users/vincent/Documents/auto_path/test.plist"
 #    echo provision_profile_file_path
@@ -29,21 +33,30 @@ function findMobileProvision()
         if [[ "$result" != "" ]]
         then
 #             echo $applicationidentifier
-             echo $file
+              echo $file
+              flag=1
 #             echo "找到了签名文件" #使用该profile文件签名
-# echo $file
+#             echo $file
              break
 
-        else
-              echo ""
+#        else
+#              echo ""
         fi
-    else
-    echo $file #是目录
+#    else
+#      echo $file #是目录
     fi
     done
+
+
 }
 
-ret=`findMobileProvision`
+rootpath="/Users/vincent/Library/MobileDevice/Provisioning Profiles/"
+ret=`findMobileProvision "${rootpath}"`
+if [["$ret" == ""]]
+ then
+  rootpath="/Users/vincent/Documents/auto_path/mobileprovision"
+  ret=`findMobileProvision "${rootpath}"`
+fi
 
 echo "${ret}"
 #main()
