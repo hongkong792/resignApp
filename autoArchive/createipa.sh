@@ -12,12 +12,14 @@ if [[ $mock == "test" ]]
  then
     CODE_SIGN_IDENTITY="iPhone Developer: YIN XIANG (6NNP32G68F)"
     export rootpath="/Users/vincent/Documents/auto_path/mobileprovision/debug"
+    config=Debug
     last="debug"
     echo "打测试包"
 else
    CODE_SIGN_IDENTITY="iPhone Distribution: YIN XIANG (LFVLF9TKSD)"
    export rootpath="/Users/vincent/Documents/auto_path/mobileprovision/distribute"
    last="destribute"
+   config=Release
    echo "打正式包"
 fi
 #根据bundleid查找provision file
@@ -98,7 +100,7 @@ time xcodebuild -workspace ${projectDir}/${projectName}.xcworkspace \
 -sdk iphoneos \
 build CODE_SIGN_IDENTITY="${CODE_SIGN_IDENTITY}" \
 PROVISIONING_PROFILE="${PROVISIONING_PROFILE}" \
--configuration Release \
+-configuration $config \
 DEVELOPMENT_TEAM=LFVLF9TKSD \
 -derivedDataPath ${projectDir}/build
 
@@ -157,6 +159,10 @@ appDownloadName="IPA名字"
 # App Bundle id
 appBundleId="com.huanqiu.architect"
 
+APPID="leiji117512@yeah.net"
+APPPASSWORD="cnhs-ridn-qkzz-tloq"
+
+ALTOOLPATH="/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Versions/A/Support/altool"
 # 创建不同 app ipa 目录
 mkdir $allIPAPackPath/$appName
 rm -rf $allIPAPackPath/$appName/*
@@ -176,36 +182,30 @@ fi
 
 rm -rf ${ipaPath}/"${schemeName}_${last}.ipa"
 xcrun -sdk iphoneos PackageApplication -v ${ipaPath}/Payload/${schemeName}.app  -o ${ipaPath}/"${schemeName}_${last}_${bundleVersion}.ipa"
+
+
 if [[ $? = 0 ]]; then
 echo "成功生成ipa"
 ###如果是debug，自动上传firm
-#    if ${ipaPath}/"${schemeName}_${last}.ipa" -a  [[ $mock == "test" ]]; then
-    fir login -T ee19875dcb941f0256c4c1a3224f3963       # fir.im token
-    fir publish ${ipaPath}/"${schemeName}_${last}_${bundleVersion}.ipa"
-        if [[ $? = 0 ]]; then
-          echo "${bundleVersion} 上传firm成功"
-        fi
-
+    if [ -e ${ipaPath}/"${schemeName}_${last}_${bundleVersion}.ipa" -a $mock == "test" ]; then
+        fir login -T ee19875dcb941f0256c4c1a3224f3963       # fir.im token
+        fir publish ${ipaPath}/"${schemeName}_${last}_${bundleVersion}.ipa"
+            if [[ $? = 0 ]]; then
+              echo "${bundleVersion} 上传firm成功"
+            fi
+    elif [ -e ${ipaPath}/"${schemeName}_${last}_${bundleVersion}.ipa" -a $mock == "release" ]; then
+    #验证信息
+    "${ALTOOLPATH}" --validate-app -f ${ipaPath}/"${schemeName}_${last}_${bundleVersion} -u "${APPID}" -p "${APPPASSWORD}" --output-format xml
+    #上传iTunesConnect
+    "${ALTOOLPATH}" --upload-app -f ${ipaPath}/"${schemeName}_${last}_${bundleVersion} -u "${APPID}" -p "${APPPASSWORD}" --output-format xml
+    fi
 else
 echo "生成ipa失败"
 fi
 rm -rf ${ipaPath}/Payload
 rm -rf ${projectDir}/build
+
 exit
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

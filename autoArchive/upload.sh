@@ -21,7 +21,18 @@
 
 
 
-if $is_uploadfir ; then
-fir login -T $upload_token       # fir.im token
-fir publish $export_ipa_path/$ipa_name.ipa
-fi
+#if $is_uploadfir ; then
+#fir login -T ee19875dcb941f0256c4c1a3224f3963      # fir.im token
+#fir publish /Users/vincent/Documents/auto_path/ipa/TiKuForUniversal_debug_24.ipa
+#fi
+
+
+APPID="leiji117512@yeah.net"
+APPPASSWORD="cnhs-ridn-qkzz-tloq"
+ALTOOLPATH="/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/Frameworks/ITunesSoftwareService.framework/Versions/A/Support/altool"
+
+##上传到appstore
+#验证信息
+"${ALTOOLPATH}" --validate-app -f /Users/vincent/Documents/auto_path/ipa/TiKuForUniversal_destribute_24.ipa -u "${APPID}" -p "${APPPASSWORD}" --output-format xml
+#上传iTunesConnect
+"${ALTOOLPATH}" --upload-app -f /Users/vincent/Documents/auto_path/ipa/TiKuForUniversal_destribute_24.ipa -u "${APPID}" -p "${APPPASSWORD}" --output-format xml
